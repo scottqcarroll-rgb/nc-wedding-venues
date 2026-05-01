@@ -1,0 +1,11 @@
+credentials.json
+token.json
+daily_summary.html
+last_run.json
+__pycache__/
+*.pyc
+.DS_Store
+.env
+*.egg-info/
+dist/
+build/
