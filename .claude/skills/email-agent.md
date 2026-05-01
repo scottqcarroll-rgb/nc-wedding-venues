@@ -63,14 +63,13 @@ Check your Gmail and/or Yahoo Mail inbox, classify emails as important or not im
 
 ### Yahoo Mail Setup (One-Time)
 
-1. Sign in at https://login.yahoo.com
-2. Go to Account Security → App Passwords
-3. Select "Mail" and generate an app password (16-character code)
-4. Edit `gmail-agent/.env` and add:
+1. Get your BellSouth/Yahoo email address and password
+2. Edit `gmail-agent/.env` and add:
    ```
    YAHOO_EMAIL=youremail@bellsouth.net
-   YAHOO_APP_PASSWORD=xxxx-xxxx-xxxx-xxxx
+   YAHOO_PASSWORD=your-regular-password
    ```
+3. (If password doesn't work, you may need to enable IMAP access in Yahoo account settings at https://login.yahoo.com → Account Info → Security)
 
 ## Files & Directories
 

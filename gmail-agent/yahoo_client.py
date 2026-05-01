@@ -9,9 +9,9 @@ YAHOO_IMAP_PORT = 993
 
 
 def load_yahoo_credentials():
-    """Load Yahoo email and app password from .env file."""
+    """Load Yahoo email and password from .env file."""
     yahoo_email = os.environ.get('YAHOO_EMAIL')
-    yahoo_password = os.environ.get('YAHOO_APP_PASSWORD')
+    yahoo_password = os.environ.get('YAHOO_PASSWORD')
 
     if not yahoo_email or not yahoo_password:
         # Try reading from .env file
@@ -21,19 +21,15 @@ def load_yahoo_credentials():
                 for line in f:
                     if line.startswith('YAHOO_EMAIL='):
                         yahoo_email = line.split('=', 1)[1].strip()
-                    elif line.startswith('YAHOO_APP_PASSWORD='):
+                    elif line.startswith('YAHOO_PASSWORD='):
                         yahoo_password = line.split('=', 1)[1].strip()
 
     if not yahoo_email or not yahoo_password:
         raise ValueError(
             "[ERROR] Yahoo credentials not found.\n"
-            "Set YAHOO_EMAIL and YAHOO_APP_PASSWORD in .env:\n"
+            "Set YAHOO_EMAIL and YAHOO_PASSWORD in .env:\n"
             "YAHOO_EMAIL=youremail@bellsouth.net\n"
-            "YAHOO_APP_PASSWORD=xxxx-xxxx-xxxx-xxxx\n\n"
-            "To generate an app password:\n"
-            "1. Sign in at https://login.yahoo.com\n"
-            "2. Go to Account Security → App Passwords\n"
-            "3. Select 'Mail' and generate a new password"
+            "YAHOO_PASSWORD=your-regular-password"
         )
 
     return yahoo_email, yahoo_password
