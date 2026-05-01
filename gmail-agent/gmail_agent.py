@@ -49,8 +49,11 @@ def main():
     """Main orchestration flow."""
     print("[*] Gmail Morning Agent starting...")
 
-    if has_already_run_today():
-        print("[OK] Already ran today. Exiting.")
+    # Check for --force flag to bypass daily guard
+    force_run = '--force' in sys.argv
+
+    if has_already_run_today() and not force_run:
+        print("[OK] Already ran today. Use --force to run again.")
         return
 
     try:
