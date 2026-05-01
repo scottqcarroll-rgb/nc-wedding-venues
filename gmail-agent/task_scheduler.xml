@@ -13,7 +13,7 @@
         <Duration>P1000D</Duration>
         <StopAtDurationEnd>false</StopAtDurationEnd>
       </Repetition>
-      <StartBoundary>2024-01-15T08:00:00</StartBoundary>
+      <StartBoundary>2024-01-15T09:00:00</StartBoundary>
       <Enabled>true</Enabled>
       <ScheduleByDay>
         <DaysInterval>1</DaysInterval>
@@ -48,7 +48,7 @@
   <Actions Context="Author">
     <Exec>
       <Command>python.exe</Command>
-      <Arguments>gmail_agent.py</Arguments>
+      <Arguments>email_agent.py</Arguments>
       <WorkingDirectory>C:\Users\scarroll\OneDrive\Desktop\Claude_Code\gmail-agent</WorkingDirectory>
     </Exec>
   </Actions>
