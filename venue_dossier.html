@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NC Distressed Venue Targets — Strategy Dossier</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0f1117;
+    color: #e2e8f0;
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  header {
+    max-width: 1100px;
+    margin: 0 auto 48px;
+    border-bottom: 1px solid #2d3748;
+    padding-bottom: 28px;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #a0aec0;
+  }
+
+  header h2 {
+    font-size: 36px;
+    font-weight: 800;
+    color: #f7fafc;
+    margin-top: 6px;
+    line-height: 1.2;
+  }
+
+  header p {
+    margin-top: 12px;
+    color: #718096;
+    font-size: 14px;
+  }
+
+  .legend {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #a0aec0;
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+    gap: 24px;
+  }
+
+  .card {
+    background: #1a1f2e;
+    border-radius: 16px;
+    border: 1px solid #2d3748;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: #4a5568; }
+
+  .card-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #2d3748;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .card-title-block { flex: 1; }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f7fafc;
+    line-height: 1.3;
+  }
+
+  .card-location {
+    font-size: 12px;
+    color: #718096;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .badge-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .badge-acquire  { background: #2d1b1b; color: #fc8181; border: 1px solid #9b2c2c; }
+  .badge-partner  { background: #1a2d1e; color: #68d391; border: 1px solid #276749; }
+  .badge-monitor  { background: #1a1f2d; color: #76e4f7; border: 1px solid #2b6cb0; }
+  .badge-nodata   { background: #2d2d1a; color: #f6e05e; border: 1px solid #975a16; }
+
+  .score-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    font-size: 22px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+
+  .score-5 { background: #1a2d20; color: #48bb78; border: 2px solid #48bb78; }
+  .score-4 { background: #1a2820; color: #68d391; border: 2px solid #68d391; }
+  .score-3 { background: #1e2a1a; color: #f6e05e; border: 2px solid #d69e2e; }
+  .score-2 { background: #2a1e1a; color: #fbd38d; border: 2px solid #c05621; }
+  .score-1 { background: #2d1a1a; color: #fc8181; border: 2px solid #9b2c2c; }
+
+  .card-body { padding: 20px 24px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #4a5568;
+    margin-bottom: 6px;
+  }
+
+  .status-pill {
+    display: inline-block;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+
+  .status-open     { background: #1a2d20; color: #68d391; }
+  .status-closed   { background: #2d1b1b; color: #fc8181; }
+  .status-active   { background: #1a2438; color: #76e4f7; }
+  .status-unclear  { background: #2d2d1a; color: #f6e05e; }
+
+  .timing-bar-wrap { display: flex; flex-direction: column; gap: 6px; }
+
+  .timing-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .timing-label { font-size: 12px; color: #a0aec0; width: 60px; flex-shrink: 0; }
+
+  .bar-bg {
+    flex: 1;
+    height: 6px;
+    background: #2d3748;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .bar-fill { height: 100%; border-radius: 3px; }
+
+  .urgency-high   { background: #fc8181; width: 100%; }
+  .urgency-medium { background: #f6e05e; width: 60%; }
+  .urgency-low    { background: #4a5568; width: 25%; }
+
+  .conf-high   { background: #48bb78; width: 100%; }
+  .conf-medium { background: #f6e05e; width: 60%; }
+  .conf-low    { background: #e53e3e; width: 25%; }
+
+  .distress-box {
+    background: #131720;
+    border-left: 3px solid #4a5568;
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #a0aec0;
+    line-height: 1.6;
+  }
+
+  .outreach-box {
+    background: #131a14;
+    border-left: 3px solid #276749;
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #9ae6b4;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .scores-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .score-mini-block {
+    flex: 1;
+    background: #131720;
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+
+  .score-mini-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #4a5568;
+    margin-bottom: 4px;
+  }
+
+  .score-mini-val {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .score-mini-dots {
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+    margin-top: 5px;
+  }
+
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #2d3748; }
+  .dot.on-acq  { background: #fc8181; }
+  .dot.on-part { background: #68d391; }
+  .dot.on-both { background: #76e4f7; }
+
+  .time-sensitivity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+
+  .ts-critical { background: #2d1b1b; color: #fc8181; border: 1px solid #9b2c2c; }
+  .ts-high     { background: #2d2415; color: #fbd38d; border: 1px solid #c05621; }
+  .ts-medium   { background: #1a2438; color: #76e4f7; border: 1px solid #2b6cb0; }
+  .ts-low      { background: #1e2030; color: #718096; border: 1px solid #4a5568; }
+
+  .pulse { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+  .pulse-critical { background: #fc8181; animation: pulse 1.2s infinite; }
+  .pulse-high     { background: #fbd38d; }
+  .pulse-medium   { background: #76e4f7; }
+  .pulse-low      { background: #718096; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .card-footer {
+    padding: 12px 24px;
+    border-top: 1px solid #2d3748;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: #4a5568;
+  }
+
+  .insufficient { opacity: 0.55; }
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>NC Distressed Wedding Venue Intelligence</h1>
+  <h2>Acquisition &amp; Partnership Target Dossier</h2>
+  <p>Generated April 2026 &nbsp;·&nbsp; 6 targets identified &nbsp;·&nbsp; 3 actionable &nbsp;·&nbsp; 2 monitor &nbsp;·&nbsp; 1 insufficient data</p>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#fc8181"></div> Acquire</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#68d391"></div> Partner</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#76e4f7"></div> Monitor</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f6e05e"></div> Insufficient Data</div>
+  </div>
+</header>
+
+<div class="grid">
+
+  <!-- ── CHAMPAGNE MANOR ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title-block">
+        <div class="card-title">Champagne Manor</div>
+        <div class="card-location">Monroe &nbsp;·&nbsp; Charlotte Metro</div>
+      </div>
+      <div class="badge-group">
+        <span class="badge badge-acquire">Acquire</span>
+        <span class="score-ring score-5">5</span>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div>
+        <div class="section-label">Status</div>
+        <span class="status-pill status-closed">Closed — Foreclosed &amp; Owner Arrested</span>
+      </div>
+
+      <div>
+        <div class="section-label">Time Sensitivity</div>
+        <span class="time-sensitivity-chip ts-critical">
+          <span class="pulse pulse-critical"></span>
+          Critical — Act Now
+        </span>
+        <div style="font-size:12px;color:#718096;margin-top:8px;">Court proceedings are active. Foreclosure assets are typically liquidated within 90–180 days of filing. Window to engage lender/trustee is open now.</div>
+      </div>
+
+      <div>
+        <div class="section-label">Scores</div>
+        <div class="scores-row">
+          <div class="score-mini-block">
+            <div class="score-mini-label">Acquisition</div>
+            <div class="score-mini-val" style="color:#fc8181;">5</div>
+            <div class="score-mini-dots">
+              <div class="dot on-acq"></div><div class="dot on-acq"></div><div class="dot on-acq"></div><div class="dot on-acq"></div><div class="dot on-acq"></div>
+            </div>
+          </div>
+          <div class="score-mini-block">
+            <div class="score-mini-label">Partnership</div>
+            <div class="score-mini-val" style="color:#4a5568;">1</div>
+            <div class="score-mini-dots">
+              <div class="dot on-acq"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+          <div class="score-mini-block">
+            <div class="score-mini-label">Data Confidence</div>
+            <div class="score-mini-val" style="color:#48bb78;">High</div>
+            <div class="bar-bg" style="margin-top:6px;"><div class="bar-fill conf-high"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Key Distress Signals</div>
+        <div class="distress-box">Owner Jason Lottmann arrested Jan 28, 2025 on multiple felony fraud counts. $4.6M total owed to couples and investors. COVID bridge loan failure compounded by active parallel investor scheme. Property now in court proceedings under lender/trustee control.</div>
+      </div>
+
+      <div>
+        <div class="section-label">Outreach Angle</div>
+        <div class="outreach-box">⚠️ Do NOT contact owner. Approach lender or court-appointed trustee only. "We are hospitality real estate investors focused on distressed NC venue assets — we'd like to discuss a clean acquisition offer on the Champagne Manor property."</div>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <span>Source: WBTV / WCNC / WSOC / Fox News</span>
+      <span>Outreach Priority: <strong style="color:#fc8181">HIGH</strong></span>
+    </div>
+  </div>
+
+  <!-- ── THE COTTON ROOM ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title-block">
+        <div class="card-title">The Cotton Room</div>
+        <div class="card-location">Durham &nbsp;·&nbsp; Triangle</div>
+      </div>
+      <div class="badge-group">
+        <span class="badge badge-partner">Partner</span>
+        <span class="score-ring score-5">5</span>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div>
+        <div class="section-label">Status</div>
+        <span class="status-pill status-open">Open — Reputation Damaged</span>
+      </div>
+
+      <div>
+        <div class="section-label">Time Sensitivity</div>
+        <span class="time-sensitivity-chip ts-high">
+          <span class="pulse pulse-high"></span>
+          High — 60–90 Day Window
+        </span>
+        <div style="font-size:12px;color:#718096;margin-top:8px;">Incident broke Sept 2025. Viral media cycle fades in 3–4 months. Approach now while the pain is fresh and management is most receptive to outside help.</div>
+      </div>
+
+      <div>
+        <div class="section-label">Scores</div>
+        <div class="scores-row">
+          <div class="score-mini-block">
+            <div class="score-mini-label">Acquisition</div>
+            <div class="score-mini-val" style="color:#4a5568;">1</div>
+            <div class="score-mini-dots">
+              <div class="dot on-acq"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+          <div class="score-mini-block">
+            <div class="score-mini-label">Partnership</div>
+            <div class="score-mini-val" style="color:#68d391;">5</div>
+            <div class="score-mini-dots">
+              <div class="dot on-part"></div><div class="dot on-part"></div><div class="dot on-part"></div><div class="dot on-part"></div><div class="dot on-part"></div>
+            </div>
+          </div>
+          <div class="score-mini-block">
+            <div class="score-mini-label">Data Confidence</div>
+            <div class="score-mini-val" style="color:#48bb78;">High</div>
+            <div class="bar-bg" style="margin-top:6px;"><div class="bar-fill conf-high"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Key Distress Signals</div>
+        <div class="distress-box">TC Hospitality Group refused to refund ~$18K deposit after groom died May 2025. All other vendors refunded; venue did not. Google rating crashed from ~4.5 to 2.9 after viral coverage on WRAL, Fox News, and national outlets. Hundreds of 1-star reviews. Owner response was hostile — a classic burnout signal in an otherwise operational venue.</div>
+      </div>
+
+      <div>
+        <div class="section-label">Outreach Angle</div>
+        <div class="outreach-box">"Your core product is strong — the incident is the only thing driving your rating down. We specialize in reputation recovery and operations management. You keep ownership; we restore your 4.5+ rating and run the day-to-day."</div>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <span>Source: WRAL / Fox News / Tyla / CafeMom</span>
+      <span>Outreach Priority: <strong style="color:#fc8181">HIGH</strong></span>
+    </div>
+  </div>
+
+  <!-- ── HIDDEN RIVER EVENTS ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title-block">
+        <div class="card-title">Hidden River Events</div>
+        <div class="card-location">Swannanoa &nbsp;·&nbsp; Asheville / Western NC</div>
+      </div>
+      <div class="badge-group">
+        <span class="badge badge-partner">Partner</span>
+        <span class="score-ring score-4">4</span>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div>
+        <div class="section-label">Status</div>
+        <span class="status-pill status-open">Open — Distressed &nbsp;·&nbsp; Reopening April 2026</span>
+      </div>
+
+      <div>
+        <div class="section-label">Time Sensitivity</div>
+        <span class="time-sensitivity-chip ts-high">
+          <span class="pulse pulse-high"></span>
+          High — Reopening Window
+        </span>
+        <div style="font-size:12px;color:#718096;margin-top:8px;">Venue reopens April 2026. Owner needs a booked pipeline on Day 1 after 18 months dark. Approach before reopening to position as the partner who fills the calendar.</div>
+      </div>
+
+      <div>
+        <div class="section-label">Scores</div>
+        <div class="scores-row">
+          <div class="score-mini-block">
+            <div class="score-mini-label">Acquisition</div>
+            <div class="score-mini-val" style="color:#4a5568;">1</div>
+            <div class="score-mini-dots">
+              <div class="dot on-acq"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+          <div class="score-mini-block">
+            <div class="score-mini-label">Partnership</div>
+            <div class="score-mini-val" style="color:#68d391;">4</div>
+            <div class="score-mini-dots">
+              <div class="dot on-part"></div><div class="dot on-part"></div><div class="dot on-part"></div><div class="dot on-part"></div><div class="dot"></div>
+            </div>
+          </div>
+          <div class="score-mini-block">
+            <div class="score-mini-label">Data Confidence</div>
+            <div class="score-mini-val" style="color:#f6e05e;">Med</div>
+            <div class="bar-bg" style="margin-top:6px;"><div class="bar-fill conf-medium"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Key Distress Signals</div>
+        <div class="distress-box">Hurricane Helene (Sept 27, 2024) caused catastrophic flooding of the Swannanoa River valley. Venue closed all of 2024. Additional renovation closure through 2025. ~18 months of near-zero revenue on an 18-year-old business. Owner has been transparent throughout — not burned out from bad decisions, but financially strained from an act of nature.</div>
+      </div>
+
+      <div>
+        <div class="section-label">Outreach Angle</div>
+        <div class="outreach-box">"You've operated 18 years and survived what most venues never face. As you reopen in April 2026, we handle bookings, vendor relationships, and revenue pipeline — so you can focus on delivering the experience you've spent nearly two decades building."</div>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <span>Source: hiddenriverevents.com press releases</span>
+      <span>Outreach Priority: <strong style="color:#fc8181">HIGH</strong></span>
+    </div>
+  </div>
+
+  <!-- ── OXBOW ESTATE ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title-block">
+        <div class="card-title">Oxbow Estate</div>
+        <div class="card-location">Clayton &nbsp;·&nbsp; Triangle</div>
+      </div>
+      <div class="badge-group">
+        <span class="badge badge-monitor">Monitor</span>
+        <span class="score-ring score-3">3</span>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div>
+        <div class="section-label">Status</div>
+        <span class="status-pill status-closed">Closed — March 2025 (Voluntary)</span>
+      </div>
+
+      <div>
+        <div class="section-label">Time Sensitivity</div>
+        <span class="time-sensitivity-chip ts-medium">
+          <span class="pulse pulse-medium"></span>
+          Medium — Watch 6 Months
+        </span>
+        <div style="font-size:12px;color:#718096;margin-top:8px;">No confirmed foreclosure or insolvency. Owner closed voluntarily — financial distress may develop as carrying costs mount on a non-operating property. Re-assess Q3 2026.</div>
+      </div>
+
+      <div>
+        <div class="section-label">Scores</div>
+        <div class="scores-row">
+          <div class="score-mini-block">
+            <div class="score-mini-label">Acquisition</div>
+            <div class="score-mini-val" style="color:#f6e05e;">3</div>
+            <div class="score-mini-dots">
+              <div class="dot on-acq"></div><div class="dot on-acq"></div><div class="dot on-acq"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+          <div class="score-mini-block">
+            <div class="score-mini-label">Partnership</div>
+            <div class="score-mini-val" style="color:#4a5568;">2</div>
+            <div class="score-mini-dots">
+              <div class="dot on-part"></div><div class="dot on-part"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+          <div class="score-mini-block">
+            <div class="score-mini-label">Data Confidence</div>
+            <div class="score-mini-val" style="color:#f6e05e;">Med</div>
+            <div class="bar-bg" style="margin-top:6px;"><div class="bar-fill conf-medium"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Key Distress Signals</div>
+        <div class="distress-box">Undisclosed 40-person fire code limit inside main house. Active residential development on adjacent land during booked dates — not disclosed to couples until late. Mass cancellations overwhelmed revenue. Owner closed voluntarily March 2025. No confirmed foreclosure. Property entity likely still legally active.</div>
+      </div>
+
+      <div>
+        <div class="section-label">Outreach Angle</div>
+        <div class="outreach-box">"We work with venue owners navigating fire code compliance and construction disruption. If you're open to discussing the property's future — whether that's a sale or a restructured operation — we'd welcome a brief conversation."</div>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <span>Source: Gold &amp; Sage Photography blog</span>
+      <span>Outreach Priority: <strong style="color:#76e4f7">MEDIUM</strong></span>
+    </div>
+  </div>
+
+  <!-- ── VALORA OAK ESTATE ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title-block">
+        <div class="card-title">The Valora Oak Estate</div>
+        <div class="card-location">Durham &nbsp;·&nbsp; Triangle &nbsp;·&nbsp; fka Farm Champion Estate</div>
+      </div>
+      <div class="badge-group">
+        <span class="badge badge-monitor">Monitor</span>
+        <span class="score-ring score-3">3</span>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div>
+        <div class="section-label">Status</div>
+        <span class="status-pill status-active">Active — Rebranded Under New Operator</span>
+      </div>
+
+      <div>
+        <div class="section-label">Time Sensitivity</div>
+        <span class="time-sensitivity-chip ts-low">
+          <span class="pulse pulse-low"></span>
+          Low — Re-assess in 12 Months
+        </span>
+        <div style="font-size:12px;color:#718096;margin-top:8px;">Currently operating under Realty Rhythm LLC. Watch for signs the new operator is struggling — if they repeat the Chapter 11 pattern, acquisition or partnership window opens fast.</div>
+      </div>
+
+      <div>
+        <div class="section-label">Scores</div>
+        <div class="scores-row">
+          <div class="score-mini-block">
+            <div class="score-mini-label">Acquisition</div>
+            <div class="score-mini-val" style="color:#fbd38d;">2</div>
+            <div class="score-mini-dots">
+              <div class="dot on-acq"></div><div class="dot on-acq"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+          <div class="score-mini-block">
+            <div class="score-mini-label">Partnership</div>
+            <div class="score-mini-val" style="color:#f6e05e;">3</div>
+            <div class="score-mini-dots">
+              <div class="dot on-part"></div><div class="dot on-part"></div><div class="dot on-part"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+          <div class="score-mini-block">
+            <div class="score-mini-label">Data Confidence</div>
+            <div class="score-mini-val" style="color:#f6e05e;">Med</div>
+            <div class="bar-bg" style="margin-top:6px;"><div class="bar-fill conf-medium"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Key Distress Signals</div>
+        <div class="distress-box">The Farm LLC (original operator) filed Chapter 11 bankruptcy January 2024. Operator was a tenant on this 22-acre Durham estate — under 200 bookings affected. Property owner replaced bankrupt tenant with Realty Rhythm LLC. Venue currently operating with positive reviews. History shows the property owner is willing to change operators — an opening if the current one weakens.</div>
+      </div>
+
+      <div>
+        <div class="section-label">Outreach Angle</div>
+        <div class="outreach-box">"The estate recently cycled through an operator transition after Chapter 11. If the current management arrangement is still evolving, we'd be interested in a long-term management partnership conversation with the property owner directly."</div>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <span>Source: ABC11 Raleigh-Durham</span>
+      <span>Outreach Priority: <strong style="color:#76e4f7">MEDIUM</strong></span>
+    </div>
+  </div>
+
+  <!-- ── LILYMONT FARM ── -->
+  <div class="card insufficient">
+    <div class="card-header">
+      <div class="card-title-block">
+        <div class="card-title">Lilymont Farm</div>
+        <div class="card-location">Efland &nbsp;·&nbsp; Triangle / Piedmont</div>
+      </div>
+      <div class="badge-group">
+        <span class="badge badge-nodata">Insufficient Data</span>
+        <span class="score-ring score-1">1</span>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div>
+        <div class="section-label">Status</div>
+        <span class="status-pill status-unclear">Unclear — Reportedly Closed 2023-2024</span>
+      </div>
+
+      <div>
+        <div class="section-label">Time Sensitivity</div>
+        <span class="time-sensitivity-chip ts-low">
+          <span class="pulse pulse-low"></span>
+          Low — Verify Before Any Action
+        </span>
+        <div style="font-size:12px;color:#718096;margin-top:8px;">No public complaint data. No media coverage. Cannot score without verification. Complete pre-outreach checklist first.</div>
+      </div>
+
+      <div>
+        <div class="section-label">Scores</div>
+        <div class="scores-row">
+          <div class="score-mini-block">
+            <div class="score-mini-label">Acquisition</div>
+            <div class="score-mini-val" style="color:#4a5568;">1</div>
+            <div class="score-mini-dots">
+              <div class="dot on-acq"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+          <div class="score-mini-block">
+            <div class="score-mini-label">Partnership</div>
+            <div class="score-mini-val" style="color:#4a5568;">1</div>
+            <div class="score-mini-dots">
+              <div class="dot on-part"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+          <div class="score-mini-block">
+            <div class="score-mini-label">Data Confidence</div>
+            <div class="score-mini-val" style="color:#e53e3e;">Low</div>
+            <div class="bar-bg" style="margin-top:6px;"><div class="bar-fill conf-low"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Pre-Outreach Checklist</div>
+        <div class="distress-box" style="border-left-color:#d69e2e;">
+          ☐ &nbsp;Check NC Secretary of State — is the entity still active?<br>
+          ☐ &nbsp;Check Alamance County Register of Deeds — any liens or foreclosure filings?<br>
+          ☐ &nbsp;Check Instagram / Facebook — what is the last post date?<br>
+          ☐ &nbsp;Re-score after verification.
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Outreach Angle (if verified active)</div>
+        <div class="outreach-box">"We're researching farm venues in the Piedmont — open to a brief call about your current plans for the property?"</div>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <span>Source: Zola listing only</span>
+      <span>Outreach Priority: <strong style="color:#718096">LOW</strong></span>
+    </div>
+  </div>
+
+</div>
+
+<div style="max-width:1100px;margin:48px auto 0;padding:24px;border-top:1px solid #2d3748;font-size:12px;color:#4a5568;text-align:center;">
+  NC Distressed Wedding Venue Intelligence &nbsp;·&nbsp; Compiled April 2026 &nbsp;·&nbsp; For internal strategy use only
+</div>
+
+</body>
+</html>
