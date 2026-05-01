@@ -9,11 +9,16 @@ import os
 import json
 import sys
 import webbrowser
+import requests
 from datetime import datetime
 
 from gmail_client import get_authenticated_service as get_gmail_service, fetch_recent_emails as fetch_gmail_emails
 from email_classifier import classify_emails
 from dashboard import generate_dashboard
+
+# Telegram Bot credentials
+TELEGRAM_BOT_TOKEN = "8773175847:AAGE_xLobOi7pKZUaww7XTZKpg20YltgJjc"
+TELEGRAM_CHAT_ID = "7542619200"
 
 LAST_RUN_FILE = 'last_run.json'
 
@@ -43,6 +48,28 @@ def has_already_run_today():
     last_run = load_last_run_date()
     today = datetime.now().date().isoformat()
     return last_run == today
+
+
+def send_telegram_notification(important_count, not_important_count, total_count):
+    """Send a summary notification via Telegram."""
+    try:
+        message = f"""📧 Morning Email Summary
+
+Total: {total_count}
+✅ Important: {important_count}
+⬜ Not Important: {not_important_count}
+
+Dashboard opened in browser."""
+
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        data = {
+            "chat_id": TELEGRAM_CHAT_ID,
+            "text": message
+        }
+        requests.post(url, json=data, timeout=5)
+        print("[*] Telegram notification sent!")
+    except Exception as e:
+        print(f"[WARN] Failed to send Telegram notification: {e}")
 
 
 def main():
@@ -115,6 +142,7 @@ def main():
             f.write(html)
         print(f"[*] Dashboard written to {dashboard_path}")
         webbrowser.open(f'file:///{dashboard_path}')
+        send_telegram_notification(0, 0, 0)
         save_run_date()
         print("[OK] Done!")
         return
@@ -134,6 +162,11 @@ def main():
         emails_with_classification.append(email)
 
     print("[*] Generating dashboard...")
+
+    # Count important vs not important
+    important_count = len([e for e in emails_with_classification if e.get('importance') == 'important'])
+    not_important_count = len([e for e in emails_with_classification if e.get('importance') == 'not_important'])
+
     html = generate_dashboard(emails_with_classification, title=title)
 
     dashboard_path = os.path.abspath('daily_summary.html')
@@ -143,6 +176,9 @@ def main():
     print(f"[*] Dashboard written to {dashboard_path}")
     print("[*] Opening dashboard in browser...")
     webbrowser.open(f'file:///{dashboard_path}')
+
+    # Send Telegram notification
+    send_telegram_notification(important_count, not_important_count, len(all_emails))
 
     save_run_date()
     print("[OK] Done! Dashboard opened successfully.")
