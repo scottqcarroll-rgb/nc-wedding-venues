@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-def generate_dashboard(emails_with_classification):
+def generate_dashboard(emails_with_classification, title="Morning Email Summary"):
     """Generate a self-contained HTML dashboard from classified emails."""
 
     important = [e for e in emails_with_classification if e.get('importance') == 'important']
@@ -15,7 +15,7 @@ def generate_dashboard(emails_with_classification):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gmail Morning Summary</title>
+    <title>{title}</title>
     <style>
         * {{
             box-sizing: border-box;
@@ -225,6 +225,29 @@ def generate_dashboard(emails_with_classification):
             margin-left: 8px;
         }}
 
+        .source-badge {{
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-right: 8px;
+            text-transform: uppercase;
+        }}
+
+        .source-gmail {{
+            background: rgba(118, 228, 247, 0.15);
+            color: #76e4f7;
+            border: 1px solid #76e4f7;
+        }}
+
+        .source-yahoo {{
+            background: rgba(183, 148, 244, 0.15);
+            color: #b794f4;
+            border: 1px solid #b794f4;
+        }}
+
         @media (max-width: 768px) {{
             .content {{
                 grid-template-columns: 1fr;
@@ -246,7 +269,7 @@ def generate_dashboard(emails_with_classification):
     <div class="container">
         <div class="header">
             <div class="header-left">
-                <h1>📧 Gmail Morning Summary</h1>
+                <h1>📧 {title}</h1>
                 <div class="header-date">{today}</div>
             </div>
             <div class="stats">
@@ -296,9 +319,16 @@ def _render_email_cards(emails):
         from_addr = email.get('from', 'Unknown')
         snippet = email.get('snippet', '')
         reason = email.get('reason', '')
+        source = email.get('source', 'Unknown')
+
+        # Determine source badge class
+        source_class = 'source-gmail' if source == 'Gmail' else 'source-yahoo'
 
         card = f"""
             <div class="email-card">
+                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                    <span class="source-badge {source_class}">{_escape_html(source)}</span>
+                </div>
                 <div class="email-from">{_escape_html(from_addr)}</div>
                 <div class="email-subject">{_escape_html(subject)}</div>
                 <div class="email-snippet">{_escape_html(snippet)}</div>
